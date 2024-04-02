@@ -1,0 +1,7 @@
+python3 -m venv venv
+source venv/bin/activate
+
+pip install environs
+pip install aiogram==2.25.1
+pip install psycopg2
+pip install SQLAlchemy
