@@ -55,10 +55,15 @@ async def add_product_price(message: Message, state: FSMContext,):
     await NewPost.next()
 
 
+# test
+async def message_id_info(message: Message):
+    await message.reply(f"Message: {message.message_thread_id}")
 
 
-
-
+# test
+async def send_message_by_id(message: Message):
+    await message.forward(settings.super_bot.ADMIN_ID, message.message_thread_id)
+    await message.reply(f'Message: {message.is_topic_message}')
 
 
 def register_handlers(dp: Dispatcher):
@@ -67,4 +72,7 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(add_product_title, state=NewPost.title)
     dp.register_message_handler(add_product_description, state=NewPost.description)
     dp.register_message_handler(add_product_price, state=NewPost.price)
+
+    dp.register_message_handler(message_id_info, commands=['msg'])  # test
+    dp.register_message_handler(send_message_by_id, commands=['msgby'])  # test
 
