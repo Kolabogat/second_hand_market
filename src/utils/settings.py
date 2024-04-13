@@ -4,9 +4,10 @@ from dataclasses import dataclass
 
 # ENVIRONMENTS
 @dataclass
-class SuperBot:
-    bot_token: str
+class TelegramBot:
+    BOT_TOKEN: str
     ADMIN_ID: int
+    GROUP_ID: int
 
 
 @dataclass
@@ -27,7 +28,7 @@ class Redis:
 
 @dataclass
 class Settings:
-    super_bot: SuperBot
+    telegrambot: TelegramBot
     postgresql: PostgreSQL
     redis: Redis
 
@@ -37,9 +38,10 @@ def get_settings(path: str):
     env.read_env(path)
 
     return Settings(
-        super_bot=SuperBot(
-            bot_token=env.str('TOKEN'),
-            ADMIN_ID=env.int('ADMIN_ID')
+        telegrambot=TelegramBot(
+            BOT_TOKEN=env.str('TOKEN'),
+            ADMIN_ID=env.int('ADMIN_ID'),
+            GROUP_ID=env.int('GROUP_ID'),
         ),
         postgresql=PostgreSQL(
             POSTGRES_HOST=env.str('POSTGRES_HOST'),

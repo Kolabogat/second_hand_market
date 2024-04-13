@@ -9,14 +9,28 @@ from utils.settings import settings
 from utils import text
 from utils import keyboard
 from db.database import DBManager
+from utils.bot import bot
 
 
 database = DBManager()
 
 
+async def bot_forward_message(from_chat_id: int, message_id: int):
+    from_chat_id = settings.telegrambot.ADMIN_ID
+    await bot.forward_message(
+        chat_id=settings.telegrambot.ADMIN_ID,
+        from_chat_id=from_chat_id,
+        message_id=message_id,
+    )
+
+
+async def forward_message(message: Message):
+    await bot_forward_message(message.chat.id, message.message_id)
+
+
 async def start(message: Message):
     await message.answer_sticker(random.choice(text.stickers))
-    if message.from_user.id == settings.super_bot.ADMIN_ID:
+    if message.from_user.id == settings.telegrambot.ADMIN_ID:
         await message.answer(f'You enter as admin!')
     await message.answer(text.start_text.format(
         first_name=message.from_user.first_name,
@@ -55,24 +69,11 @@ async def add_product_price(message: Message, state: FSMContext,):
     await NewPost.next()
 
 
-# test
-async def message_id_info(message: Message):
-    await message.reply(f"Message: {message.message_thread_id}")
-
-
-# test
-async def send_message_by_id(message: Message):
-    await message.forward(settings.super_bot.ADMIN_ID, message.message_thread_id)
-    await message.reply(f'Message: {message.is_topic_message}')
-
-
 def register_handlers(dp: Dispatcher):
     dp.register_message_handler(start, commands=['start'])
     dp.register_message_handler(add_product, commands=['add_product'])
     dp.register_message_handler(add_product_title, state=NewPost.title)
     dp.register_message_handler(add_product_description, state=NewPost.description)
     dp.register_message_handler(add_product_price, state=NewPost.price)
-
-    dp.register_message_handler(message_id_info, commands=['msg'])  # test
-    dp.register_message_handler(send_message_by_id, commands=['msgby'])  # test
+    dp.register_message_handler(forward_message, commands=['forward'])
 

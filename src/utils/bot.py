@@ -4,7 +4,7 @@ from utils.settings import settings
 
 storage = MemoryStorage()
 
-bot = Bot(settings.super_bot.bot_token)
+bot = Bot(settings.telegrambot.BOT_TOKEN)
 dp = Dispatcher(bot, storage=storage)
 
 
