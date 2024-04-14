@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, BigInteger, ForeignKey
+from sqlalchemy import Column, String, BigInteger, ForeignKey, Integer, Date
 from sqlalchemy.orm import DeclarativeBase, relationship
 
 
@@ -11,22 +11,22 @@ class Post(Base):
 
     id = Column(BigInteger, primary_key=True)
     user_tg_id = Column(BigInteger, nullable=False)
+    first_name = Column(String, nullable=False)
+    username = Column(String, nullable=False)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     price = Column(String, primary_key=False)
-    # tag = Column(String, nullable=False)
-
-    # photo = Relationship(back_populates='post')
-
-
-
+    photo = relationship('Photo', backref='post')
 
 
 class Photo(Base):
     __tablename__ = 'photo_table'
 
     id = Column(BigInteger, primary_key=True)
-    photo_path = Column(String, nullable=False)
-
-    post_id = Column(BigInteger, ForeignKey('post_table.id'))
-    post = relationship('Post', backref='photo_post', foreign_keys=[post_id])
+    date = Column(Date, nullable=False)
+    file_id = Column(String, nullable=False)
+    file_unique_id = Column(String, nullable=False)
+    file_size = Column(BigInteger, nullable=False)
+    width = Column(BigInteger, nullable=False)
+    height = Column(BigInteger, nullable=False)
+    post_id = Column(Integer, ForeignKey('post_table.id'))
