@@ -25,16 +25,22 @@ class DBManager:
             first_name,
             username,
             title,
+            title_message_id,
             description,
-            price
+            description_message_id,
+            price,
+            price_message_id,
     ):
         post_object = Post(
             user_tg_id=user_tg_id,
             first_name=first_name,
             username=username,
             title=title,
+            title_message_id=title_message_id,
             description=description,
+            description_message_id=description_message_id,
             price=price,
+            price_message_id=price_message_id,
         )
         with Session(self.engine) as session:
             session.add(post_object)
@@ -64,6 +70,16 @@ class DBManager:
         with Session(self.engine) as session:
             session.add(photo_object)
             session.commit()
+
+    # def get_post(
+    #         self,
+    #         user_tg_id,
+    #         first_name,
+    #         username,
+    #         title,
+    #         description,
+    #         price
+    # ):
 
 
 db = DBManager()
