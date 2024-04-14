@@ -68,6 +68,7 @@ async def add_product(message: Message):
 async def add_product_title(message: Message, state: FSMContext,):
     async with state.proxy() as data:
         data['title'] = message.text
+        data['title_message_id'] = message.message_id
     await message.answer(f'Description of product:')
     await NewPost.next()
 
@@ -75,6 +76,7 @@ async def add_product_title(message: Message, state: FSMContext,):
 async def add_product_description(message: Message, state: FSMContext,):
     async with state.proxy() as data:
         data['description'] = message.text
+        data['description_message_id'] = message.message_id
     await message.answer(f'Price of product:')
     await NewPost.next()
 
@@ -82,22 +84,37 @@ async def add_product_description(message: Message, state: FSMContext,):
 async def add_product_price(message: Message, state: FSMContext,):
     async with state.proxy() as data:
         data['price'] = message.text
-    database.add_post(
-        user_tg_id=message.from_user.id,
-        title=data.get('title'),
-        description=data.get('description'),
-        price=data.get('price'),
-    )
-    await message.answer(f'Photo of product:')  # Message of ticket
+        data['price_message_id'] = message.message_id
+    await message.answer(f'Photo of product:')
     await NewPost.next()
 
 
 async def add_product_photo(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        data['photo'] = message.photo[-1].file_id
-    await message.bot.download_file(file_path=message.photo[-1].file_id, destination='file_name')
-    # await database.add_photo(message.message.photo[-1])
-    await message.answer('Success', reply_markup=settings.telegrambot.ADMIN_ID)
+        photo = message.photo[-1]
+    post = {
+        'user_tg_id': message.from_user.id,
+        'first_name': message.from_user.first_name,
+        'username': message.from_user.username,
+        'title': data.get('title'),
+        'title_message_id': data.get('title_message_id'),
+        'description': data.get('description'),
+        'description_message_id': data.get('description_message_id'),
+        'price': data.get('price'),
+        'price_message_id': data.get('price_message_id'),
+    }
+    database.add_post(**post)
+    photo = {
+        'file_id': photo.file_id,
+        'file_unique_id': photo.file_unique_id,
+        'file_size': photo.file_size,
+        'width': photo.width,
+        'height': photo.height,
+        'date': message.date,
+        'post_id': 1,
+    }
+    database.add_photo(**photo)
+    await message.answer('Success!')
     await state.finish()
 
 
