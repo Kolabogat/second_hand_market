@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from db.models import Base
 from utils.settings import settings
 from sqlalchemy import create_engine
-from db.models import Post
+from db.models import Post, Photo
 
 
 class DBManager:
@@ -28,6 +28,15 @@ class DBManager:
         )
         with Session(self.engine) as session:
             session.bulk_save_objects([post_object])
+            session.commit()
+
+    def add_photo(self, photo_path, post_id):
+        photo_object = Photo(
+            photo_path=photo_path,
+            post_id=post_id,
+        )
+        with Session(self.engine) as session:
+            session.add(photo_object)
             session.commit()
 
 
