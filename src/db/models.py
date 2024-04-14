@@ -14,8 +14,11 @@ class Post(Base):
     first_name = Column(String, nullable=False)
     username = Column(String, nullable=False)
     title = Column(String, nullable=False)
+    title_message_id = Column(BigInteger, nullable=False)
     description = Column(String, nullable=False)
+    description_message_id = Column(BigInteger, nullable=False)
     price = Column(String, primary_key=False)
+    price_message_id = Column(BigInteger, nullable=False)
     photo = relationship('Photo', backref='post')
 
 
