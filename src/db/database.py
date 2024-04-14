@@ -19,21 +19,47 @@ class DBManager:
         except Exception as e:
             print(f'Unable to access postgresql database. \n Exception: {e}')
 
-    def add_post(self, user_tg_id, title, description, price):
+    def add_post(
+            self,
+            user_tg_id,
+            first_name,
+            username,
+            title,
+            description,
+            price
+    ):
         post_object = Post(
             user_tg_id=user_tg_id,
+            first_name=first_name,
+            username=username,
             title=title,
             description=description,
             price=price,
         )
         with Session(self.engine) as session:
-            session.bulk_save_objects([post_object])
+            session.add(post_object)
             session.commit()
+        print(post_object)
+        return post_object
 
-    def add_photo(self, photo_path, post_id):
+    def add_photo(
+            self,
+            file_id,
+            file_unique_id,
+            file_size,
+            width,
+            height,
+            date,
+            post_id,
+    ):
         photo_object = Photo(
-            photo_path=photo_path,
-            post_id=post_id,
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            width=width,
+            height=height,
+            date=date,
+            post_id=post_id
         )
         with Session(self.engine) as session:
             session.add(photo_object)
