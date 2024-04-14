@@ -45,7 +45,6 @@ class DBManager:
         with Session(self.engine) as session:
             session.add(post_object)
             session.commit()
-        print(post_object)
         return post_object
 
     def add_photo(
@@ -71,15 +70,17 @@ class DBManager:
             session.add(photo_object)
             session.commit()
 
-    # def get_post(
-    #         self,
-    #         user_tg_id,
-    #         first_name,
-    #         username,
-    #         title,
-    #         description,
-    #         price
-    # ):
+    def get_post(
+            self,
+            user_tg_id,
+            title_message_id,
+    ):
+        with Session(self.engine) as session:
+            query = session.query(Post).filter_by(
+                user_tg_id=user_tg_id,
+                title_message_id=title_message_id
+            ).first()
+        return query.id
 
 
 db = DBManager()
