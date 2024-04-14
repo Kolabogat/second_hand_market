@@ -104,6 +104,10 @@ async def add_product_photo(message: Message, state: FSMContext):
         'price_message_id': data.get('price_message_id'),
     }
     database.add_post(**post)
+    post_id = database.get_post(
+        post.get('user_tg_id'),
+        post.get('title_message_id')
+    )
     photo = {
         'file_id': photo.file_id,
         'file_unique_id': photo.file_unique_id,
@@ -111,7 +115,7 @@ async def add_product_photo(message: Message, state: FSMContext):
         'width': photo.width,
         'height': photo.height,
         'date': message.date,
-        'post_id': 1,
+        'post_id': post_id,
     }
     database.add_photo(**photo)
     await message.answer('Success!')
