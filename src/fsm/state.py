@@ -6,4 +6,5 @@ class NewPost(StatesGroup):
     description = State()
     price = State()
     photo = State()
+    end = State()
 

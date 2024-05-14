@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 
 from db.models import Post
 from fsm.state import NewPost
+from handlers.conf import get_post_data_from_message, get_photo_data_from_message, add_product_and_photo_to_db
 from utils.settings import settings
 from utils import text
 from utils import keyboard
@@ -60,12 +61,12 @@ async def start(message: Message):
     ), reply_markup=keyboard.reply_markup)
 
 
-async def add_product(message: Message):
+async def add_product_and_get_product_title(message: Message):
     await NewPost.title.set()
     await message.answer(f'Title of product:')
 
 
-async def add_product_title(message: Message, state: FSMContext,):
+async def add_product_title_and_get_description(message: Message, state: FSMContext,):
     async with state.proxy() as data:
         data['title'] = message.text
         data['title_message_id'] = message.message_id
@@ -73,7 +74,7 @@ async def add_product_title(message: Message, state: FSMContext,):
     await NewPost.next()
 
 
-async def add_product_description(message: Message, state: FSMContext,):
+async def add_product_description_and_get_price(message: Message, state: FSMContext,):
     async with state.proxy() as data:
         data['description'] = message.text
         data['description_message_id'] = message.message_id
@@ -81,7 +82,7 @@ async def add_product_description(message: Message, state: FSMContext,):
     await NewPost.next()
 
 
-async def add_product_price(message: Message, state: FSMContext,):
+async def add_product_price_and_get_photo(message: Message, state: FSMContext,):
     async with state.proxy() as data:
         data['price'] = message.text
         data['price_message_id'] = message.message_id
@@ -89,35 +90,10 @@ async def add_product_price(message: Message, state: FSMContext,):
     await NewPost.next()
 
 
-async def add_product_photo(message: Message, state: FSMContext):
+async def add_product_photo_and_commit_all(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        photo = message.photo[-1]
-    post = {
-        'user_tg_id': message.from_user.id,
-        'first_name': message.from_user.first_name,
-        'username': message.from_user.username,
-        'title': data.get('title'),
-        'title_message_id': data.get('title_message_id'),
-        'description': data.get('description'),
-        'description_message_id': data.get('description_message_id'),
-        'price': data.get('price'),
-        'price_message_id': data.get('price_message_id'),
-    }
-    database.add_post(**post)
-    post_id = database.get_post(
-        post.get('user_tg_id'),
-        post.get('title_message_id')
-    )
-    photo = {
-        'file_id': photo.file_id,
-        'file_unique_id': photo.file_unique_id,
-        'file_size': photo.file_size,
-        'width': photo.width,
-        'height': photo.height,
-        'date': message.date,
-        'post_id': post_id,
-    }
-    database.add_photo(**photo)
+        data['photo'] = message.photo[-1]
+    await add_product_and_photo_to_db(message, state)
     await message.answer('Success!')
     await state.finish()
 
@@ -125,12 +101,13 @@ async def add_product_photo(message: Message, state: FSMContext):
 def register_handlers(dp: Dispatcher):
     dp.register_message_handler(start, commands=['start'])
     dp.register_message_handler(forward_message, commands=['forward'])
-    dp.register_message_handler(add_product, commands=['add_product'])
+    dp.register_message_handler(add_product_and_get_product_title, commands=['add_product'])
     dp.register_message_handler(message_info, content_types=['photo'])
     dp.register_message_handler(bot_send_media_group, commands=['js'])
     dp.register_message_handler(message_info, commands=['info'])
 
-    dp.register_message_handler(add_product_title, state=NewPost.title)
-    dp.register_message_handler(add_product_description, state=NewPost.description)
-    dp.register_message_handler(add_product_price, state=NewPost.price)
-    dp.register_message_handler(add_product_photo, state=NewPost.photo, content_types=['photo'])
+    dp.register_message_handler(add_product_title_and_get_description, state=NewPost.title)
+    dp.register_message_handler(add_product_description_and_get_price, state=NewPost.description)
+    dp.register_message_handler(add_product_price_and_get_photo, state=NewPost.price)
+    dp.register_message_handler(add_product_photo_and_commit_all, state=NewPost.photo)
+    dp.register_message_handler(add_product_photo_and_commit_all, state=NewPost.photo, content_types=['photo'])

@@ -9,13 +9,14 @@ from db.models import Post, Photo
 class DBManager:
     def __init__(self):
         try:
-            self.engine = create_engine(f'postgresql+psycopg2://'
-                                        f'{settings.postgresql.POSTGRES_USER}:'
-                                        f'{settings.postgresql.POSTGRES_PASSWORD}@'
-                                        f'{settings.postgresql.POSTGRES_HOST}:'
-                                        f'{settings.postgresql.POSTGRES_PORT}/'
-                                        f'{settings.postgresql.POSTGRES_DB}'
-                                        )
+            self.engine = create_engine(
+                f'postgresql+psycopg2://'
+                f'{settings.postgresql.POSTGRES_USER}:'
+                f'{settings.postgresql.POSTGRES_PASSWORD}@'
+                f'{settings.postgresql.POSTGRES_HOST}:'
+                f'{settings.postgresql.POSTGRES_PORT}/'
+                f'{settings.postgresql.POSTGRES_DB}'
+            )
         except Exception as e:
             print(f'Unable to access postgresql database. \n Exception: {e}')
 
