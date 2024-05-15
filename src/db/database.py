@@ -59,17 +59,18 @@ class DBManager:
             post_id,
     ):
         photo_object = Photo(
+            date=date,
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
             width=width,
             height=height,
-            date=date,
             post_id=post_id
         )
         with Session(self.engine) as session:
             session.add(photo_object)
             session.commit()
+        return photo_object
 
     def get_post(
             self,
@@ -81,7 +82,7 @@ class DBManager:
                 user_tg_id=user_tg_id,
                 title_message_id=title_message_id
             ).first()
-        return query.id
+        return query
 
 
 db = DBManager()

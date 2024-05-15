@@ -1,4 +1,5 @@
-from handlers.main import database
+from db.database import DBManager
+database = DBManager()
 
 
 async def get_post_data_from_message(message, state):
@@ -21,12 +22,12 @@ async def get_photo_data_from_message(message, state, post_id):
     async with state.proxy() as data:
         photo_object = data.get('photo')
         photo = {
+            'date': message.date,
             'file_id': photo_object.file_id,
             'file_unique_id': photo_object.file_unique_id,
             'file_size': photo_object.file_size,
             'width': photo_object.width,
             'height': photo_object.height,
-            'date': message.date,
             'post_id': post_id,
         }
     return photo

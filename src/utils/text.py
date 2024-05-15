@@ -15,3 +15,10 @@ Our commands:
 
 obj = ['title', 'description', 'price', 'END']
 post_message = ['add description', 'add price', 'END', 'END']
+
+product_message = '''
+Title: {title}
+Description: {description}
+
+Price: {price}
+'''
