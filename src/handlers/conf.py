@@ -1,5 +1,8 @@
 from db.database import DBManager
 from settings.settings import settings
+from utils import text
+from utils.bot import bot
+from utils.keyboard import post_or_decline
 
 database = DBManager()
 
@@ -44,13 +47,33 @@ async def get_photo_data_from_message(message, state, post_id):
     return photo
 
 
-async def add_product_and_photo_to_db(message, state):
-    post_data = await get_post_data_from_message(message, state)
-    database.add_post(**post_data)
-    post_id = database.get_post(
-        post_data.get('user_tg_id'),
-        post_data.get('title_message_id')
+async def send_product_to_admin(user_tg_id, title_message_id, photo):
+    post = database.get_post(user_tg_id, title_message_id)
+    await bot.send_photo(
+        chat_id=settings.telegrambot.ADMIN_ID,
+        photo=photo.file_id,
+        caption=text.product_message.format(
+            title=post.title,
+            description=post.description,
+            price=post.price,
+            user_tg_id=user_tg_id,
+            title_message_id=title_message_id,
+        ),
+        reply_markup=post_or_decline,
     )
-    photo_data = await get_photo_data_from_message(message, state, post_id)
-    database.add_photo(**photo_data)
 
+
+async def admin_forward_message(from_chat_id: int, message_id: int):
+    await bot.forward_message(
+        chat_id=settings.telegrambot.ADMIN_ID,
+        from_chat_id=from_chat_id,
+        message_id=message_id,
+    )
+
+
+async def group_copy_message(from_chat_id: int, message_id: int):
+    await bot.copy_message(
+        chat_id=settings.telegrambot.GROUP_ID,
+        from_chat_id=from_chat_id,
+        message_id=message_id,
+    )

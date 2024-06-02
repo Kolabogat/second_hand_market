@@ -1,13 +1,13 @@
 import random
 from aiogram import Dispatcher
-from aiogram.types import Message, MediaGroup
+from aiogram.types import Message, MediaGroup, CallbackQuery
 from aiogram.dispatcher import FSMContext
 
 from fsm.state import NewPost
 from handlers.conf import (
     get_post_data_from_message,
     get_photo_data_from_message,
-    is_admin,
+    is_admin, send_product_to_admin, group_copy_message, admin_forward_message
 )
 from settings.settings import settings
 from utils import text
@@ -15,6 +15,7 @@ from utils import keyboard
 from db.database import DBManager
 from utils.bot import bot
 import json
+
 
 database = DBManager()
 
@@ -41,16 +42,6 @@ async def bot_send_media_group(message: Message):
 
 
 @is_admin
-async def bot_forward_message(from_chat_id: int, message_id: int):
-    from_chat_id = settings.telegrambot.ADMIN_ID
-    await bot.forward_message(
-        chat_id=settings.telegrambot.ADMIN_ID,
-        from_chat_id=from_chat_id,
-        message_id=message_id,
-    )
-
-
-@is_admin
 async def bot_send_message(chat_id: int):
     text_message = 'Ваше предложение одобрено!'
     await bot.send_message(
@@ -61,12 +52,12 @@ async def bot_send_message(chat_id: int):
 
 @is_admin
 async def forward_message(message: Message):
-    await bot_forward_message(message.chat.id, message.message_id)
+    await admin_forward_message(message.chat.id, message.message_id)
 
 
 # @is_admin
-async def get_user_id(message: Message):
-    await message.answer(message.from_user.id)
+async def get_chat_id(message: Message):
+    await message.answer(message.chat.id)
 
 
 async def start(message: Message):
@@ -110,7 +101,6 @@ async def add_product_price_and_get_photo(message: Message, state: FSMContext,):
 async def add_product_photo_and_commit_all(message: Message, state: FSMContext):
     async with state.proxy() as data:
         data['photo'] = message.photo[-1]
-    # await add_product_and_photo_to_db(message, state)
     post_data = await get_post_data_from_message(message, state)
     database.add_post(**post_data)
     post_id = database.get_post(
@@ -119,35 +109,34 @@ async def add_product_photo_and_commit_all(message: Message, state: FSMContext):
     )
     photo_data = await get_photo_data_from_message(message, state, post_id.id)
     database.add_photo(**photo_data)
-    await message.answer('Success!')
 
-    await send_product_to_group(
+    await send_product_to_admin(
         user_tg_id=message.from_user.id,
         title_message_id=data.get('title_message_id'),
         photo=data.get('photo'),
     )
-
+    await message.answer('Success!')
     await state.finish()
 
 
-async def send_product_to_group(user_tg_id, title_message_id, photo):
-    post = database.get_post(user_tg_id, title_message_id)
-    await bot.send_photo(
-        chat_id=settings.telegrambot.GROUP_ID,
-        photo=photo.file_id,
-        caption=text.product_message.format(
-            title=post.title,
-            description=post.description,
-            price=post.price,
-        ),
+async def callback_query_keyboard(callback_query: CallbackQuery):
+    if callback_query.data == 'post':
+        await group_copy_message(
+            settings.telegrambot.ADMIN_ID,
+            callback_query.message.message_id,
+        )
+    await bot.delete_message(
+        settings.telegrambot.ADMIN_ID,
+        callback_query.message.message_id
     )
 
 
 def register_handlers(dp: Dispatcher):
     dp.register_message_handler(start, commands=['start'])
     dp.register_message_handler(add_product_and_get_product_title, commands=['add_product'])
-    dp.register_message_handler(get_user_id, commands=['get_id'])
+    dp.register_callback_query_handler(callback_query_keyboard)
 
+    dp.register_message_handler(get_chat_id, commands=['get_id'])
     dp.register_message_handler(forward_message, commands=['forward'])
     dp.register_message_handler(message_info, content_types=['sticker'])
     dp.register_message_handler(bot_send_media_group, commands=['js'])
