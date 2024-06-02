@@ -14,45 +14,14 @@ from utils import text
 from utils import keyboard
 from db.database import DBManager
 from utils.bot import bot
-import json
+
 
 
 database = DBManager()
 
-
-@is_admin
-async def message_info(message: Message):
-    await message.answer(json.dumps(dict(message), indent=4))
-    print(f'YOUR JSON: \n {json.dumps(dict(message), indent=4)}')
-
-
 @is_admin
 async def send_sticker(message: Message):
     await message.answer_sticker('CAACAgIAAxkBAAIGKGZcbBuY3o2dYdXQzYyUPnLNVZtsAAI1AQACMNSdEbS4Nf1moLZ8NQQ')
-
-
-@is_admin
-async def bot_send_media_group(message: Message):
-    media = MediaGroup()
-    media.attach_photo(photo='AgACAgIAAxkBAAIEAWYbsKXP8vP8aU-515lY7sjQbMMPAAKn1zEbM5jhSF8JHY_6e7s8AQADAgADcwADNAQ')
-    media.attach_photo(photo='AgACAgIAAx0CfZjGGAADYmYbsycW0-7i4FcrbLeiEn2dnOywAALA1jEbgrDgSPXs-k_DmTgFAQADAgADcwADNAQ')
-    media.attach_photo(photo='AgACAgIAAxkBAAIEAWYbsKXP8vP8aU-515lY7sjQbMMPAAKn1zEbM5jhSF8JHY_6e7s8AQADAgADcwADNAQ')
-
-    await bot.send_media_group(message.chat.id, media=media)
-
-
-@is_admin
-async def bot_send_message(chat_id: int):
-    text_message = 'Ваше предложение одобрено!'
-    await bot.send_message(
-        chat_id=chat_id,
-        text=text_message,
-    )
-
-
-@is_admin
-async def forward_message(message: Message):
-    await admin_forward_message(message.chat.id, message.message_id)
 
 
 # @is_admin
@@ -145,10 +114,6 @@ def register_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(callback_query_keyboard)
 
     dp.register_message_handler(get_chat_id, commands=['get_id'])
-    dp.register_message_handler(forward_message, commands=['forward'])
-    dp.register_message_handler(message_info, content_types=['sticker'])
-    dp.register_message_handler(bot_send_media_group, commands=['js'])
-    dp.register_message_handler(message_info, commands=['info'])
     dp.register_message_handler(send_sticker, commands=['sticker'])
 
     dp.register_message_handler(add_product_title_and_get_description, state=NewPost.title)
