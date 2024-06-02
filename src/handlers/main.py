@@ -67,6 +67,11 @@ async def forward_message(message: Message):
     await bot_forward_message(message.chat.id, message.message_id)
 
 
+# @is_admin
+async def get_user_id(message: Message):
+    await message.answer(message.from_user.id)
+
+
 async def start(message: Message):
     await message.answer_sticker(random.choice(text.stickers))
     if message.from_user.id == settings.telegrambot.ADMIN_ID:
@@ -143,8 +148,10 @@ async def send_product_to_group(user_tg_id, title_message_id, photo):
 
 def register_handlers(dp: Dispatcher):
     dp.register_message_handler(start, commands=['start'])
-    dp.register_message_handler(forward_message, commands=['forward'])
     dp.register_message_handler(add_product_and_get_product_title, commands=['add_product'])
+    dp.register_message_handler(get_user_id, commands=['get_id'])
+
+    dp.register_message_handler(forward_message, commands=['forward'])
     dp.register_message_handler(message_info, content_types=['sticker'])
     dp.register_message_handler(bot_send_media_group, commands=['js'])
     dp.register_message_handler(message_info, commands=['info'])
