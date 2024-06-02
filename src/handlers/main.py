@@ -2,10 +2,16 @@ import random
 from aiogram import Dispatcher
 from aiogram.types import Message, MediaGroup
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import check_filters
 
 from db.models import Post
 from fsm.state import NewPost
-from handlers.conf import get_post_data_from_message, get_photo_data_from_message, add_product_and_photo_to_db
+from handlers.conf import (
+    get_post_data_from_message,
+    get_photo_data_from_message,
+    add_product_and_photo_to_db,
+    is_admin,
+)
 from utils.settings import settings
 from utils import text
 from utils import keyboard
@@ -13,15 +19,21 @@ from db.database import DBManager
 from utils.bot import bot
 import json
 
-
 database = DBManager()
 
 
+@is_admin
 async def message_info(message: Message):
     await message.answer(json.dumps(dict(message), indent=4))
     print(f'YOUR JSON: \n {json.dumps(dict(message), indent=4)}')
 
 
+@is_admin
+async def send_sticker(message: Message):
+    await message.answer_sticker('CAACAgIAAxkBAAIGKGZcbBuY3o2dYdXQzYyUPnLNVZtsAAI1AQACMNSdEbS4Nf1moLZ8NQQ')
+
+
+@is_admin
 async def bot_send_media_group(message: Message):
     media = MediaGroup()
     media.attach_photo(photo='AgACAgIAAxkBAAIEAWYbsKXP8vP8aU-515lY7sjQbMMPAAKn1zEbM5jhSF8JHY_6e7s8AQADAgADcwADNAQ')
@@ -31,6 +43,7 @@ async def bot_send_media_group(message: Message):
     await bot.send_media_group(message.chat.id, media=media)
 
 
+@is_admin
 async def bot_forward_message(from_chat_id: int, message_id: int):
     from_chat_id = settings.telegrambot.ADMIN_ID
     await bot.forward_message(
@@ -40,6 +53,7 @@ async def bot_forward_message(from_chat_id: int, message_id: int):
     )
 
 
+@is_admin
 async def bot_send_message(chat_id: int):
     text_message = 'Ваше предложение одобрено!'
     await bot.send_message(
@@ -48,6 +62,7 @@ async def bot_send_message(chat_id: int):
     )
 
 
+@is_admin
 async def forward_message(message: Message):
     await bot_forward_message(message.chat.id, message.message_id)
 
@@ -130,9 +145,10 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(start, commands=['start'])
     dp.register_message_handler(forward_message, commands=['forward'])
     dp.register_message_handler(add_product_and_get_product_title, commands=['add_product'])
-    dp.register_message_handler(message_info, content_types=['photo'])
+    dp.register_message_handler(message_info, content_types=['sticker'])
     dp.register_message_handler(bot_send_media_group, commands=['js'])
     dp.register_message_handler(message_info, commands=['info'])
+    dp.register_message_handler(send_sticker, commands=['sticker'])
 
     dp.register_message_handler(add_product_title_and_get_description, state=NewPost.title)
     dp.register_message_handler(add_product_description_and_get_price, state=NewPost.description)

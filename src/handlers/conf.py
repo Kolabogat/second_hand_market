@@ -1,5 +1,16 @@
 from db.database import DBManager
+from utils.settings import settings
+
 database = DBManager()
+
+
+def is_admin(func):
+    async def wrapper(*args, **kwargs):
+        user_id = dict(*args).get('from').get('id')
+        if user_id == settings.telegrambot.ADMIN_ID:
+            return await func(*args)
+        return
+    return wrapper
 
 
 async def get_post_data_from_message(message, state):
