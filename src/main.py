@@ -3,7 +3,7 @@ from utils.bot import dp
 from db.database import create_all
 import logging
 
-from handlers.main import register_handlers
+from handlers.handlers import register_handlers
 
 logging.basicConfig(
         level=logging.INFO,
