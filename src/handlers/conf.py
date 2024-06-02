@@ -1,5 +1,5 @@
 from db.database import DBManager
-from utils.settings import settings
+from settings.settings import settings
 
 database = DBManager()
 

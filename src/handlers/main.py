@@ -2,17 +2,14 @@ import random
 from aiogram import Dispatcher
 from aiogram.types import Message, MediaGroup
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import check_filters
 
-from db.models import Post
 from fsm.state import NewPost
 from handlers.conf import (
     get_post_data_from_message,
     get_photo_data_from_message,
-    add_product_and_photo_to_db,
     is_admin,
 )
-from utils.settings import settings
+from settings.settings import settings
 from utils import text
 from utils import keyboard
 from db.database import DBManager
