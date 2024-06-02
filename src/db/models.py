@@ -18,7 +18,9 @@ class Post(Base):
     description = Column(String, nullable=False)
     description_message_id = Column(BigInteger, nullable=False)
     price = Column(String, primary_key=False)
-    price_message_id = Column(BigInteger, nullable=False)
+    price_message_id = Column(String, nullable=False)
+    contacts = Column(BigInteger, nullable=False)
+    contacts_message_id = Column(BigInteger, nullable=False)
     photo = relationship('Photo', backref='post')
 
 

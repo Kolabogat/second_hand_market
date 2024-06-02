@@ -20,6 +20,7 @@ post_message = ['add description', 'add price', 'END', 'END']
 product_message = '''
 Title: {title}
 Description: {description}
+Contacts: {telegram_id}, {contacts}
 
 Price: {price}
 '''

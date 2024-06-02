@@ -31,6 +31,8 @@ class DBManager:
             description_message_id,
             price,
             price_message_id,
+            contacts,
+            contacts_message_id,
     ):
         post_object = Post(
             user_tg_id=user_tg_id,
@@ -42,6 +44,8 @@ class DBManager:
             description_message_id=description_message_id,
             price=price,
             price_message_id=price_message_id,
+            contacts=contacts,
+            contacts_message_id=contacts_message_id,
         )
         with Session(self.engine) as session:
             session.add(post_object)

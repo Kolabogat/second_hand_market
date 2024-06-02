@@ -28,6 +28,8 @@ async def get_post_data_from_message(message, state):
             'description_message_id': data.get('description_message_id'),
             'price': data.get('price'),
             'price_message_id': data.get('price_message_id'),
+            'contacts': data.get('contacts'),
+            'contacts_message_id': data.get('contacts_message_id'),
         }
     return post_data
 
@@ -56,6 +58,8 @@ async def send_product_to_admin(user_tg_id, title_message_id, photo):
             title=post.title,
             description=post.description,
             price=post.price,
+            telegram_id=user_tg_id,
+            contacts=post.contacts,
             user_tg_id=user_tg_id,
             title_message_id=title_message_id,
         ),

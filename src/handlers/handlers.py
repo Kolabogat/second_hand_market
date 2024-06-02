@@ -90,10 +90,18 @@ async def add_product_description_and_get_price(message: Message, state: FSMCont
     await NewPost.next()
 
 
-async def add_product_price_and_get_photo(message: Message, state: FSMContext,):
+async def add_product_price_and_get_contacts(message: Message, state: FSMContext,):
     async with state.proxy() as data:
         data['price'] = message.text
         data['price_message_id'] = message.message_id
+    await message.answer(f'Contacts of product:')
+    await NewPost.next()
+
+
+async def add_product_contacts_and_get_photo(message: Message, state: FSMContext,):
+    async with state.proxy() as data:
+        data['contacts'] = message.text
+        data['contacts_message_id'] = message.message_id
     await message.answer(f'Photo of product:')
     await NewPost.next()
 
@@ -145,6 +153,6 @@ def register_handlers(dp: Dispatcher):
 
     dp.register_message_handler(add_product_title_and_get_description, state=NewPost.title)
     dp.register_message_handler(add_product_description_and_get_price, state=NewPost.description)
-    dp.register_message_handler(add_product_price_and_get_photo, state=NewPost.price)
-    dp.register_message_handler(add_product_photo_and_commit_all, state=NewPost.photo)
+    dp.register_message_handler(add_product_price_and_get_contacts, state=NewPost.price)
+    dp.register_message_handler(add_product_contacts_and_get_photo, state=NewPost.contacts)
     dp.register_message_handler(add_product_photo_and_commit_all, state=NewPost.photo, content_types=['photo'])

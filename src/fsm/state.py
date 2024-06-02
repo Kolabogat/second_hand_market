@@ -5,6 +5,6 @@ class NewPost(StatesGroup):
     title = State()
     description = State()
     price = State()
+    contacts = State()
     photo = State()
-    end = State()
 
