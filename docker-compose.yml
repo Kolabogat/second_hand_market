@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python3 src/main.py
+    command: python main.py
     depends_on:
       - db
     env_file:
